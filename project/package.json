@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "dev:backend": "node server.js",
-    "build": "vite build",
+    "build": "vite build && npm run build:server",
+    "build:server": "echo 'Build complete'",
     "start": "node server.js",
     "lint": "eslint .",
     "preview": "vite preview",
