@@ -1,6 +1,31 @@
-import { BookOpen, Youtube, Award } from 'lucide-react';
+import { BookOpen, Youtube, Award, Activity } from 'lucide-react';
+import { useEffect, useState } from 'react';
+
+interface VisitStats {
+  totalVisits: number;
+  timestamp?: string;
+}
 
 function App() {
+  const [stats, setStats] = useState<VisitStats>({ totalVisits: 0 });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+
+    // Track visit
+    fetch(`${API_URL}/api/visit`)
+      .then(res => res.json())
+      .then(data => {
+        setStats(data);
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error('Failed to track visit:', err);
+        setLoading(false);
+      });
+  }, []);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
       <div className="container mx-auto px-6 py-20">
@@ -48,6 +73,40 @@ function App() {
               <p className="text-slate-600 leading-relaxed">
                 Dedicated to providing high-quality educational content that makes a real difference in students' lives.
               </p>
+            </div>
+          </div>
+
+          {/* Backend Stats Card */}
+          <div className="mt-16 bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-8 shadow-lg border border-green-100">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 bg-green-500 rounded-xl flex items-center justify-center">
+                  <Activity className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-semibold text-slate-800">Live Backend Stats</h3>
+                  <p className="text-sm text-slate-600">Powered by Express.js API</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                <span className="text-sm text-green-600 font-medium">Live</span>
+              </div>
+            </div>
+            <div className="mt-6">
+              {loading ? (
+                <div className="text-slate-600 animate-pulse">Loading stats...</div>
+              ) : (
+                <div className="flex items-baseline gap-2">
+                  <span className="text-5xl font-bold text-slate-800">{stats.totalVisits}</span>
+                  <span className="text-lg text-slate-600">total visits</span>
+                </div>
+              )}
+              {stats.timestamp && (
+                <p className="text-sm text-slate-500 mt-2">
+                  Last visit: {new Date(stats.timestamp).toLocaleString()}
+                </p>
+              )}
             </div>
           </div>
 
